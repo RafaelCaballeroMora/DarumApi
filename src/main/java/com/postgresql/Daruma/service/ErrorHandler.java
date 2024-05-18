@@ -1,4 +1,4 @@
-package com.postgresql.Daruma.config;
+package com.postgresql.Daruma.service;
 
 import javax.security.sasl.AuthenticationException;
 

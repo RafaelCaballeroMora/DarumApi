@@ -1,0 +1,63 @@
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - '--no-cache'
+      - '-t'
+      - >-
+        $_AR_HOSTNAME/$PROJECT_ID/cloud-run-source-deploy/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
+      - .
+      - '-f'
+      - Dockerfile
+      - '--build-arg=DARUMA_FIREBASE_JSON'
+    id: Build
+    secretEnv: 
+      - DARUMA_FIREBASE_JSON
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - >-
+        $_AR_HOSTNAME/$PROJECT_ID/cloud-run-source-deploy/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
+    id: Push
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
+    args:
+      - run
+      - services
+      - update
+      - $_SERVICE_NAME
+      - '--platform=managed'
+      - >-
+        --image=$_AR_HOSTNAME/$PROJECT_ID/cloud-run-source-deploy/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
+      - >-
+        --labels=managed-by=gcp-cloud-build-deploy-cloud-run,commit-sha=$COMMIT_SHA,gcb-build-id=$BUILD_ID,gcb-trigger-id=$_TRIGGER_ID
+      - '--region=$_DEPLOY_REGION'
+      - '--quiet'
+      - '--set-secrets=SPRING_DATASOURCE_URL=SPRING_DATASOURCE_URL:latest'
+      - '--set-secrets=SPRING_DATASOURCE_USERNAME=SPRING_DATASOURCE_USERNAME:latest'
+      - '--set-secrets=SPRING_DATASOURCE_PASSWORD=SPRING_DATASOURCE_PASSWORD:latest'
+      - '--set-secrets=PROXY_PORT=PROXY_PORT:latest'
+      - '--set-secrets=PROXY_IP=PROXY_IP:latest'
+      - '--set-secrets=DARUMA_FIREBASE_JSON=DARUMA_FIREBASE_JSON:latest'
+    id: Deploy
+    entrypoint: gcloud
+images:
+  - >-
+    $_AR_HOSTNAME/$PROJECT_ID/cloud-run-source-deploy/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
+options:
+  substitutionOption: ALLOW_LOOSE
+  logging: CLOUD_LOGGING_ONLY
+substitutions:
+  _PLATFORM: managed
+  _TRIGGER_ID: 92b5ce49-45cd-4e4f-bc28-8d3c3049c04e
+  _SERVICE_NAME: darumapi
+  REPO_NAME: darumapi
+  _DEPLOY_REGION: us-central1
+  _AR_HOSTNAME: us-central1-docker.pkg.dev
+tags:
+  - gcp-cloud-build-deploy-cloud-run
+  - gcp-cloud-build-deploy-cloud-run-managed
+  - darumapi
+availableSecrets:
+  secretManager:
+    - versionName: projects/5516222823/secrets/DARUMA_FIREBASE_JSON/versions/latest
+      env: DARUMA_FIREBASE_JSON
