@@ -33,10 +33,6 @@ steps:
       - '--region=$_DEPLOY_REGION'
       - '--quiet'
       - '--set-secrets=SPRING_DATASOURCE_URL=SPRING_DATASOURCE_URL:latest'
-      - '--set-secrets=SPRING_DATASOURCE_USERNAME=SPRING_DATASOURCE_USERNAME:latest'
-      - '--set-secrets=SPRING_DATASOURCE_PASSWORD=SPRING_DATASOURCE_PASSWORD:latest'
-      - '--set-secrets=PROXY_PORT=PROXY_PORT:latest'
-      - '--set-secrets=PROXY_IP=PROXY_IP:latest'
       - '--set-secrets=DARUMA_FIREBASE_JSON=DARUMA_FIREBASE_JSON:latest'
     id: Deploy
     entrypoint: gcloud

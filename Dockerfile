@@ -28,11 +28,7 @@ COPY --from=install /installFolder/target/Daruma-0.0.1-SNAPSHOT.jar /app/app.jar
 EXPOSE 8080
 
 # Set environment variables
-ENV SPRING_DATASOURCE_URL= \
-    SPRING_DATASOURCE_USERNAME= \
-    SPRING_DATASOURCE_PASSWORD= \
-    PROXY_IP= \
-    PROXY_PORT=
+ENV SPRING_DATASOURCE_URL= 
 
 # Set the command to run the JAR file with the specified Spring profile
-CMD ["sh", "-c", "java -jar -Dhttp.proxyHost=${PROXY_IP} -Dhttp.proxyPort=${PROXY_PORT} -Dspring.profiles.active=prod -DsocksProxyHost=${PROXY_IP} -DsocksProxyPort=${PROXY_PORT} /app/app.jar"]
+CMD ["sh", "-c", "java -jar -Dspring.profiles.active=prod /app/app.jar"]
